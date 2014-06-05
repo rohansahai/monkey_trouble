@@ -153,7 +153,7 @@
 		this.gameTime = (new Date - this.startTime) / 1000;
 		$('.timer').text("Time: " + this.gameTime);
     $(".ammo").html("Bananas: " + this.ship.ammo);
-    $(".kills").html("Kanye Slayings: " + this.kills);
+    $(".kills").html("Zookeepers Bananafied: " + this.kills);
 	};
 
   Game.prototype.checkCollisions = function() {
@@ -163,6 +163,19 @@
  				this.audioElement.pause();
 			  alert("You're going back to zoo little monkey!!");
         this.stop();
+				
+				$.ajax({
+				  url: "/scores.json",
+				  type: "POST",
+				  data: {
+				    name: "bubba",
+				    time: this.gameTime
+				  }, success: function (scoreData) {
+				    console.log("Score created!");
+				    console.log("issued id: " + scoreData.id);
+				  }
+				});
+				
       }
     }
     //check if the ship has picked up any ammo
@@ -258,7 +271,7 @@
     var newBullet = this.ship.fireBullet(50, 10);
     if (newBullet !== undefined && this.kills >= 1){
       this.specialBullets.push(newBullet);
-      this.kills++
+      this.kills++;
     }
   };
 
