@@ -163,19 +163,7 @@
  				this.audioElement.pause();
 			  alert("You're going back to zoo little monkey!!");
         this.stop();
-				
-				$.ajax({
-				  url: "/scores.json",
-				  type: "POST",
-				  data: {
-				    name: "bubba",
-				    time: this.gameTime
-				  }, success: function (scoreData) {
-				    console.log("Score created!");
-				    console.log("issued id: " + scoreData.id);
-				  }
-				});
-				
+				this.saveToDb();
       }
     }
     //check if the ship has picked up any ammo
@@ -186,6 +174,37 @@
       }
     }
   };
+
+	Game.prototype.saveToDb = function(){
+		var that = this;
+		$.ajax({
+		  url: "/scores.json",
+		  type: "POST",
+			beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+		  data: {
+				score: {
+			    name: "bubba", 
+			    time: this.gameTime,
+				},
+		  }, success: function (scoreData) {
+		    console.log("Score created!");
+		    console.log("issued id: " + scoreData.id);
+				$.ajax({
+					url: "/scores",
+					type: "GET",
+					success: function (data){
+						that.displayData(data);
+					}
+				})
+		  }
+		});
+	};
+	
+	Game.prototype.displayData = function(data) {
+		for (var i = 0; i < data.length; i++) {
+			console.log(data[i]['name']);
+		}
+	};
 
 	Game.prototype.isWin = function() {
 		if (this.asteroids.length === 0){
